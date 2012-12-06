@@ -1,6 +1,7 @@
 package com.mzone.android.tools.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,9 +10,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.mzone.android.tools.R;
+
 public class MyLetterView extends View {
 	OnTouchingLetterChangedListener onTouchingLetterChangedListener;
-	public static String[] b = { "local","hot", "A", "B", "C", "D", "E", "F", "G", "H",
+	private String[] b = {  "A", "B", "C", "D", "E", "F", "G", "H",
 			"I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U",
 			"V", "W", "X", "Y", "Z" };
 	int choose = -1;
@@ -19,10 +22,21 @@ public class MyLetterView extends View {
 
 	public MyLetterView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+	         init_attrs(context, attrs);
+	}
+
+	private void init_attrs(Context context, AttributeSet attrs) {
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.letterview_array);
+		 String str = a.getString(R.styleable.letterview_array_array);
+		 if(str!=null && str.length()>0){
+			 b=str.split(","); 
+		 }
+		 a.recycle();
 	}
 
 	public MyLetterView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init_attrs(context, attrs);
 	}
 
 	public MyLetterView(Context context) {
