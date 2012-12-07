@@ -6,12 +6,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mzone.android.tools.adapter.SectionIndexerListAdapter;
@@ -21,7 +22,7 @@ import com.mzone.android.tools.view.MyLetterView;
 import com.mzone.android.tools.view.MyLetterView.OnTouchingLetterChangedListener;
 import com.mzone.android.tools.view.SectionIndexerListView;
 public abstract class CustemSectionAbstractActivity extends Activity implements
-		OnTouchingLetterChangedListener {
+		OnTouchingLetterChangedListener ,AdapterView.OnItemClickListener{
 
 	private TextView overlay;
 	private MyLetterView myView;
@@ -48,10 +49,14 @@ public abstract class CustemSectionAbstractActivity extends Activity implements
 		myView.setOnTouchingLetterChangedListener(this);
 
 		overlay.setVisibility(View.INVISIBLE);
-
+		mIndexerListView.setOnItemClickListener(this);
 	}
 
 	private boolean needSort = true;
+	
+	public ListView getSectionListview(){
+		return mIndexerListView;
+	}
 
 	/**
 	 * 是否需要排序，false:以排序，无需排序， true:需要排序

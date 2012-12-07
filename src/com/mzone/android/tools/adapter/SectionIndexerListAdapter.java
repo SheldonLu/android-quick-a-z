@@ -1,6 +1,5 @@
 package com.mzone.android.tools.adapter;
 
-
 import java.util.ArrayList;
 
 import android.util.Pair;
@@ -17,199 +16,220 @@ import com.mzone.android.tools.R;
 import com.mzone.android.tools.view.SectionIndexerListView;
 
 /**
- * a section listview adapter.
- * use Pair<String, ArrayList<String>> to stone it's title and every section . 
+ * a section listview adapter. use Pair<String, ArrayList<String>> to stone it's
+ * title and every section .
+ * 
  * @author Administrator
- *
+ * 
  */
-public class SectionIndexerListAdapter extends BaseAdapter implements SectionIndexer,
-        OnScrollListener {
+public class SectionIndexerListAdapter extends BaseAdapter implements
+		SectionIndexer, OnScrollListener {
+	public static int SECTION_EVERY_DATA_POSITION=R.string.unique;
+	private LayoutInflater mInflater;
 
-    private LayoutInflater mInflater;
+	private ArrayList<Pair<String, ArrayList<String>>> mPairs = new ArrayList<Pair<String, ArrayList<String>>>(
+			0);
 
-    private ArrayList<Pair<String, ArrayList<String>>> mPairs = new ArrayList<Pair<String, ArrayList<String>>>(
-            0);
-    /**
-     * 
-     * @param inflater
-     * @param pairs all section ,every section has a title
-     */
-    public SectionIndexerListAdapter(LayoutInflater inflater,
-            ArrayList<Pair<String, ArrayList<String>>> pairs) {
-        mInflater = inflater;
-        if (pairs != null) {
-            mPairs.addAll(pairs);
-        }
-    }
+	/**
+	 * 
+	 * @param inflater
+	 * @param pairs
+	 *            all section ,every section has a title
+	 */
+	public SectionIndexerListAdapter(LayoutInflater inflater,
+			ArrayList<Pair<String, ArrayList<String>>> pairs) {
+		mInflater = inflater;
+		if (pairs != null) {
+			mPairs.addAll(pairs);
+		}
+	}
 
-    @Override
-    public int getCount() {
-        int count = 0;
-        for (int i = 0; i < mPairs.size(); i++) {
-            count += mPairs.get(i).second.size();
-        }
-        return count;
-    }
+	@Override
+	public int getCount() {
+		int count = 0;
+		for (int i = 0; i < mPairs.size(); i++) {
+			count += mPairs.get(i).second.size();
+		}
+		return count;
+	}
 
-    @Override
-    public Object getItem(int position) {
-        int c = 0;
-        for (int i = 0; i < mPairs.size(); i++) {
-            if (position >= c && position < c + mPairs.get(i).second.size()) {
-                return mPairs.get(i).second.get(position - c);
-            }
-            c += mPairs.get(i).second.size();
-        }
-        return null;
-    }
+	@Override
+	public Object getItem(int position) {
+		int c = 0;
+		for (int i = 0; i < mPairs.size(); i++) {
+			if (position >= c && position < c + mPairs.get(i).second.size()) {
+				return mPairs.get(i).second.get(position - c);
+			}
+			c += mPairs.get(i).second.size();
+		}
+		return null;
+	}
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ItemCache itemCache;
-        if (convertView == null) {
-            itemCache = new ItemCache();
-            convertView = mInflater.inflate(R.layout.list_item, null);
-            itemCache.section = convertView.findViewById(R.id.header);
-            itemCache.textView = (TextView) convertView.findViewById(R.id.item_text);
-            convertView.setTag(itemCache);
-        } else {
-            itemCache = (ItemCache) convertView.getTag();
-        }
-        String str=(String) getItem(position);
-        if(str.startsWith("#") || str.startsWith("$")){
-        	itemCache.textView.setText(str.substring(1, str.length()));
-        }else{
-        	itemCache.textView.setText(str);
-        }
-        
-        final int section = getSectionForPosition(position);
-        boolean isShowSection = getPositionForSection(section) == position;
-        if (isShowSection) {
-            itemCache.section.setVisibility(View.VISIBLE);
-            ((TextView) itemCache.section.findViewById(R.id.header_text))
-                    .setText((String) getSections()[getSectionForPosition(position)]);
-        } else {
-            itemCache.section.setVisibility(View.GONE);
-        }
-        return convertView;
-    }
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		ItemCache itemCache;
+		if (convertView == null) {
+			itemCache = new ItemCache();
+			convertView = mInflater.inflate(R.layout.list_item, null);
+			itemCache.section = convertView.findViewById(R.id.header);
+			itemCache.textView = (TextView) convertView
+					.findViewById(R.id.item_text);
+			convertView.setTag(itemCache);
+		} else {
+			itemCache = (ItemCache) convertView.getTag();
+		}
 
-    static class ItemCache {
-        View section;
+		String str = (String) getItem(position);
+		//当需要参数传入时，以：分割显示数据和参数数据
+		convertView.setTag(SECTION_EVERY_DATA_POSITION,"" );
+		if (str != null && str.split(":").length == 2) {
+			String [] ss= str.split(":");
+			if (ss[0].startsWith("#") || ss[0].startsWith("$")) {
+				itemCache.textView.setText(ss[0].substring(1, ss[0].length()));
+			} else {
+				itemCache.textView.setText(ss[0]);
+			}
+			convertView.setTag(SECTION_EVERY_DATA_POSITION,ss[1] );
+		} else {
+			if (str.startsWith("#") || str.startsWith("$")) {
+				itemCache.textView.setText(str.substring(1, str.length()));
+			} else {
+				itemCache.textView.setText(str);
+			}
+		}
 
-        TextView textView;
-    }
+		final int section = getSectionForPosition(position);
+		boolean isShowSection = getPositionForSection(section) == position;
+		if (isShowSection) {
+			itemCache.section.setVisibility(View.VISIBLE);
+			((TextView) itemCache.section.findViewById(R.id.header_text))
+					.setText((String) getSections()[getSectionForPosition(position)]);
+		} else {
+			itemCache.section.setVisibility(View.GONE);
+		}
+		return convertView;
+	}
 
-    // sectionIndexer
+	static class ItemCache {
+		View section;
 
-    @Override
-    public Object[] getSections() {
-        String[] sections = new String[mPairs.size()];
-        for (int i = 0; i < mPairs.size(); i++) {
-            sections[i] = mPairs.get(i).first;
-        }
-        return sections;
-    }
+		TextView textView;
+	}
 
-    @Override
-    public int getPositionForSection(int section) {
-        if (section < 0) {
-            section = 0;
-        }
-        if (section > mPairs.size() - 1) {
-            section = mPairs.size() - 1;
-        }
-        if (section == 0) {
-            return 0;
-        }
-        int pos = 0;
-        for (int i = 0; i < section; i++) {
-            pos += mPairs.get(i).second.size();
-        }
-        return pos;
-    }
+	// sectionIndexer
 
-    @Override
-    public int getSectionForPosition(int position) {
-        if (position == 0) {
-            return 0;
-        }
-        int secpos = 0;
-        for (int i = 0; i < mPairs.size(); i++) {
-            if (position >= secpos && position < secpos + mPairs.get(i).second.size()) {
-                return i;
-            }
-            secpos += mPairs.get(i).second.size();
-        }
-        return -1;
-    }
+	@Override
+	public Object[] getSections() {
+		String[] sections = new String[mPairs.size()];
+		for (int i = 0; i < mPairs.size(); i++) {
+			sections[i] = mPairs.get(i).first;
+		}
+		return sections;
+	}
 
-    /**
-     * 
-     * @param header
-     * @param position
-     * @param alpha
-     */
-    public void configurePinnedHeader(View header, int position, int alpha) {
-        TextView lSectionHeader = (TextView) header.findViewById(R.id.header_text);
-        lSectionHeader.setText((String) getSections()[getSectionForPosition(position)]);
-    }
+	@Override
+	public int getPositionForSection(int section) {
+		if (section < 0) {
+			section = 0;
+		}
+		if (section > mPairs.size() - 1) {
+			section = mPairs.size() - 1;
+		}
+		if (section == 0) {
+			return 0;
+		}
+		int pos = 0;
+		for (int i = 0; i < section; i++) {
+			pos += mPairs.get(i).second.size();
+		}
+		return pos;
+	}
 
-    // scroll
+	@Override
+	public int getSectionForPosition(int position) {
+		if (position == 0) {
+			return 0;
+		}
+		int secpos = 0;
+		for (int i = 0; i < mPairs.size(); i++) {
+			if (position >= secpos
+					&& position < secpos + mPairs.get(i).second.size()) {
+				return i;
+			}
+			secpos += mPairs.get(i).second.size();
+		}
+		return -1;
+	}
 
-    @Override
-    public void onScrollStateChanged(AbsListView view, int scrollState) {
-        // on action
-    }
+	/**
+	 * 
+	 * @param header
+	 * @param position
+	 * @param alpha
+	 */
+	public void configurePinnedHeader(View header, int position, int alpha) {
+		TextView lSectionHeader = (TextView) header
+				.findViewById(R.id.header_text);
+		lSectionHeader
+				.setText((String) getSections()[getSectionForPosition(position)]);
+	}
 
-    @Override
-    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-            int totalItemCount) {
-        if(view instanceof SectionIndexerListView){
-            ((SectionIndexerListView) view).configurePinnedHeaderView(firstVisibleItem);
-        }
-    }
-    
-    /**
-     * Pinned header state: don't show the header.
-     */
-    public static final int PINNED_HEADER_GONE = 0;
+	// scroll
 
-    /**
-     * Pinned header state: show the header at the top of the list.
-     */
-    public static final int PINNED_HEADER_VISIBLE = 1;
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// on action
+	}
 
-    /**
-     * Pinned header state: show the header. If the header extends beyond
-     * the bottom of the first shown element, push it up and clip.
-     */
-    public static final int PINNED_HEADER_PUSHED_UP = 2;
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		if (view instanceof SectionIndexerListView) {
+			((SectionIndexerListView) view)
+					.configurePinnedHeaderView(firstVisibleItem);
+		}
+	}
 
-    /**
-     * Computes the desired state of the pinned header for the given
-     * position of the first visible list item. Allowed return values are
-     * {@link #PINNED_HEADER_GONE}, {@link #PINNED_HEADER_VISIBLE} or
-     * {@link #PINNED_HEADER_PUSHED_UP}.
-     */
-    public int getPinnedHeaderState(int position) {
-        if (position < 0 || getCount() == 0) {
-            return PINNED_HEADER_GONE;
-        }
-        // The header should get pushed up if the top item shown
-        // is the last item in a section for a particular letter.
-        int section = getSectionForPosition(position);
-        int nextSectionPosition = getPositionForSection(section + 1);
-        if (nextSectionPosition != -1 && position == nextSectionPosition - 1) {
-            return PINNED_HEADER_PUSHED_UP;
-        }
-        
-        return PINNED_HEADER_VISIBLE;
-    }
+	/**
+	 * Pinned header state: don't show the header.
+	 */
+	public static final int PINNED_HEADER_GONE = 0;
+
+	/**
+	 * Pinned header state: show the header at the top of the list.
+	 */
+	public static final int PINNED_HEADER_VISIBLE = 1;
+
+	/**
+	 * Pinned header state: show the header. If the header extends beyond the
+	 * bottom of the first shown element, push it up and clip.
+	 */
+	public static final int PINNED_HEADER_PUSHED_UP = 2;
+
+	/**
+	 * Computes the desired state of the pinned header for the given position of
+	 * the first visible list item. Allowed return values are
+	 * {@link #PINNED_HEADER_GONE}, {@link #PINNED_HEADER_VISIBLE} or
+	 * {@link #PINNED_HEADER_PUSHED_UP}.
+	 */
+	public int getPinnedHeaderState(int position) {
+		if (position < 0 || getCount() == 0) {
+			return PINNED_HEADER_GONE;
+		}
+		// The header should get pushed up if the top item shown
+		// is the last item in a section for a particular letter.
+		int section = getSectionForPosition(position);
+		int nextSectionPosition = getPositionForSection(section + 1);
+		if (nextSectionPosition != -1 && position == nextSectionPosition - 1) {
+			return PINNED_HEADER_PUSHED_UP;
+		}
+
+		return PINNED_HEADER_VISIBLE;
+	}
 
 }

@@ -5,4 +5,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
 	<string name="letterview_cus">local,hot,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z</string>
+	<string name="unique">unique</string>
 </resources>
